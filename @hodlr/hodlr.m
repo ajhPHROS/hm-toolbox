@@ -391,8 +391,8 @@ classdef hodlr
                 m1 = obj.A11.sz(1);
                 n1 = obj.A11.sz(2);
                 
-                obj.A11 = create_low_rank_h_matrix(obj.A11, U(1:m1,:), V(1:n1,:));
-                obj.A22 = create_low_rank_h_matrix(obj.A22, U(m1+1:end,:), V(n1+1:end,:));
+                obj.A11 = create_semisep_h_matrix(obj.A11, U(1:m1,:), V(1:n1,:));
+                obj.A22 = create_semisep_h_matrix(obj.A22, U(m1+1:end,:), V(n1+1:end,:));
                 obj.U12 = V(1:m1,:);
                 obj.V12 = U(n1+1:end,:);
                 obj.U21 = U(m1+1:end,:);
