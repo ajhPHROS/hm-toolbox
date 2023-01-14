@@ -47,6 +47,9 @@ classdef hodlr
     % H = HODLR('low-rank', U, V) construct an HODLR representation of the low-rank
     %     matrix U*V'.
     %
+    % H = HODLR('semisep', U, V) construct an HODLR representation of the 
+    %     semiseparable matrix tril(U*V') + triu(V*U',1).
+    %
     % H = HODLR('ones', M, N) constructs an HODLR representation of the rank-1
     %     M x N matrix of all ones.
     %
@@ -236,6 +239,19 @@ classdef hodlr
                         
                         obj = create_low_rank_h_matrix(obj, varargin{2:charpos - 1});
                         
+                  	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    % AH - include new constructor for semisep matrix
+                    
+                    case 'semisep'
+                        obj = hodlr_build_hodlr_tree(size(varargin{2}, 1), ...
+                            size(varargin{3}, 1), ...
+                            hodlroption('block-size'), rowcluster, ...
+                            colcluster);
+                        
+                        obj = create_semisep_h_matrix(obj, varargin{2:charpos - 1});
+                        
+                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+                        
                     case 'ones'
                         m = varargin{2};
                         if charpos > 3
@@ -362,6 +378,29 @@ classdef hodlr
                 obj.V21 = V(1:n1,:);
             end
         end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % AH - add constructor for semiseparable matrix
+                
+        function obj = create_semisep_h_matrix(obj, U, V)
+            %CREATE_SEMISEP_H_MATRIX Create a semiseparable H matrix.
+            
+            if is_leafnode(obj)
+                obj.F = tril(U * V') + triu(V * U', 1);
+            else
+                m1 = obj.A11.sz(1);
+                n1 = obj.A11.sz(2);
+                
+                obj.A11 = create_low_rank_h_matrix(obj.A11, U(1:m1,:), V(1:n1,:));
+                obj.A22 = create_low_rank_h_matrix(obj.A22, U(m1+1:end,:), V(n1+1:end,:));
+                obj.U12 = V(1:m1,:);
+                obj.V12 = U(n1+1:end,:);
+                obj.U21 = U(m1+1:end,:);
+                obj.V21 = V(1:n1,:);
+            end
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         function H = create_tridiagonal_h_matrix(obj, A)
             %CREATE_TRIDIAGONAL_H_MATRIX Create a tridiagonal H-matrix
