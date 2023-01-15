@@ -18,10 +18,10 @@ else
     F22 = dot_frobenius(H1.A22, H2.A22);
     
     % Contribution from the block (2,1)
-    F21 = trace((H2.V21'*H1.V21)*(H1.U21'*H2.U21));
+    F21 = sum((H1.V21'*H2.V21).*(H1.U21'*H2.U21));
 
     % Contribution from the block (1,2)
-    F12 = trace((H2.V12'*H1.V12)*(H1.U12'*H2.U12));
+    F12 = sum((H1.V12'*H2.V12).*(H1.U12'*H2.U12));
     
     F = sum([ F11, F12, F21, F22 ]);
 end
